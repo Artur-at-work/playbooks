@@ -1,0 +1,38 @@
+---
+- hosts: worker1
+  tasks:
+  - name: YUM update all installed packages
+    yum:
+      name: '*'
+      state: latest
+      update_cache: yes
+      update_only: yes
+    register: yum_update_status
+
+  - name: Removing unused/leftover packages
+    yum:
+      autoremove: yes
+
+  - name: Rebooting after packages were updated
+    reboot:
+    when: yum_update_status.changed
+
+- hosts: apt
+  tasks:
+  - name: APT updating all installed packages
+    apt:
+      name: '*'
+      state: latest
+      update_cache: yes
+      only_upgrade: yes
+    register: apt_update_status
+
+  - name: Removing unused/leftover packages
+    apt:
+      autoremove: yes
+
+  - name: Rebooting after packages were updated
+    reboot:
+      post_reboot_delay: 60
+    when: apt_update_status.changed
+

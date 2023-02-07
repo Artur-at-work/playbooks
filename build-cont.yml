@@ -1,0 +1,25 @@
+---
+- hosts: master-dock
+  gather_facts: no
+  tasks:
+    - name: Creating build directory
+      file:
+        path: /root/dockerfile-build
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Copying Dockerfile
+      copy:
+        src: ./Dockerfile
+        dest: /root/dockerfile-build/Dockerfile
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Building container image
+      docker_image:
+        name: mycontainer:v1.0
+        build:
+          path: /root/dockerfile-build/
+        source: build
+        state: present
